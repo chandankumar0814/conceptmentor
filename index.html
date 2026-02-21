@@ -206,42 +206,106 @@ document.getElementById("classBoards").appendChild(div);
 }
 
 /* Certificate */
-function downloadCertificate(name,percent,grade,rank){
+
+function downloadCertificate(name, percent, grade, rank){
 
 const { jsPDF } = window.jspdf;
-let doc=new jsPDF("landscape");
-let w=doc.internal.pageSize.getWidth();
+let doc = new jsPDF("landscape");
+
+let pageWidth = doc.internal.pageSize.getWidth();
+let pageHeight = doc.internal.pageSize.getHeight();
+
+/* ================= BORDER DESIGN ================= */
+
+doc.setDrawColor(139,0,0);
+doc.setLineWidth(4);
+doc.rect(10,10,pageWidth-20,pageHeight-20);
+
+doc.setDrawColor(255,140,0);
+doc.setLineWidth(1.5);
+doc.rect(18,18,pageWidth-36,pageHeight-36);
+
+/* ================= SCHOOL NAME ================= */
+
+doc.setFont("helvetica","bold");
+doc.setFontSize(28);
+doc.setTextColor(139,0,0);
+doc.text("Birla Open Minds International School", pageWidth/2, 35, {align:"center"});
+
+doc.setFontSize(16);
+doc.setTextColor(80,80,80);
+doc.text("Purnea", pageWidth/2, 45, {align:"center"});
+
+/* ================= TITLE ================= */
+
+let isWinner = rank > 0;
 
 doc.setFontSize(26);
-doc.text("Birla Open Minds International School",w/2,30,{align:"center"});
-doc.setFontSize(18);
-doc.text("Cyber Awareness Quiz 2026",w/2,45,{align:"center"});
-
-let isWinner=rank>0;
-
-doc.setFontSize(22);
-doc.text(isWinner?"Certificate of Achievement":"Certificate of Participation",w/2,70,{align:"center"});
-
-doc.setFontSize(16);
-doc.text("This certificate is presented to",w/2,90,{align:"center"});
-
-doc.setFontSize(28);
-doc.text(name,w/2,110,{align:"center"});
-
-doc.setFontSize(16);
-doc.text(`Class: ${grade}`,w/2,125,{align:"center"});
-doc.text(`Score: ${percent}%`,w/2,135,{align:"center"});
+doc.setTextColor(0,0,0);
 
 if(isWinner){
-let rankText=rank==1?"1st":rank==2?"2nd":"3rd";
-doc.text(`Secured ${rankText} Rank`,w/2,155,{align:"center"});
+    doc.text("Certificate of Achievement", pageWidth/2, 70, {align:"center"});
 }else{
-doc.text("For active participation",w/2,155,{align:"center"});
+    doc.text("Certificate of Participation", pageWidth/2, 70, {align:"center"});
 }
+
+/* ================= BODY TEXT ================= */
+
+doc.setFontSize(16);
+doc.setTextColor(0,0,0);
+doc.text("This certificate is proudly presented to", pageWidth/2, 95, {align:"center"});
+
+/* ================= STUDENT NAME ================= */
+
+doc.setFontSize(32);
+doc.setTextColor(0,0,139);
+doc.text(name, pageWidth/2, 115, {align:"center"});
+
+/* ================= DETAILS ================= */
+
+doc.setFontSize(18);
+doc.setTextColor(0,0,0);
+doc.text(`Class: ${grade}`, pageWidth/2, 130, {align:"center"});
+doc.text(`Score: ${percent}%`, pageWidth/2, 142, {align:"center"});
+
+/* ================= RANK MESSAGE ================= */
+
+if(isWinner){
+
+let rankText = rank==1 ? "1st Rank"
+             : rank==2 ? "2nd Rank"
+             : "3rd Rank";
+
+doc.setFontSize(20);
+doc.setTextColor(139,0,0);
+doc.text(`Secured ${rankText} in Cyber Awareness Quiz 2026`, pageWidth/2, 160, {align:"center"});
+
+}else{
+
+doc.setFontSize(18);
+doc.setTextColor(0,0,0);
+doc.text("For active participation in Cyber Awareness Quiz 2026", pageWidth/2, 160, {align:"center"});
+}
+
+/* ================= DATE ================= */
+
+let today = "21/02/2026";
+
+doc.setFontSize(14);
+doc.setTextColor(0,0,0);
+doc.text(`Date: ${today}`, 30, pageHeight-35);
+
+/* ================= SIGNATURE ================= */
+
+doc.line(pageWidth-100, pageHeight-45, pageWidth-40, pageHeight-45);
+doc.setFontSize(14);
+doc.text("Principal", pageWidth-70, pageHeight-30, {align:"center"});
+
+/* ================= SAVE ================= */
 
 doc.save(name+"_Certificate.pdf");
 }
-
+    
 async function init(){
 for(let f in grades){ await loadExcel(f); }
 rankCombined567();
