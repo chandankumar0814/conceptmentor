@@ -324,27 +324,69 @@ document.getElementById("searchResult").innerHTML=html;
 }
 
 /* CERTIFICATE */
-function downloadCertificate(name,percent,grade){
-const {jsPDF}=window.jspdf;
-let doc=new jsPDF();
+function downloadCertificate(name, percent, grade){
 
-doc.setFontSize(20);
-doc.text("Birla Open Minds International School",20,30);
+const { jsPDF } = window.jspdf;
+let doc = new jsPDF("landscape");
+
+let pageWidth = doc.internal.pageSize.getWidth();
+let pageHeight = doc.internal.pageSize.getHeight();
+
+/* ===== BORDER ===== */
+doc.setDrawColor(139,0,0);
+doc.setLineWidth(3);
+doc.rect(10,10,pageWidth-20,pageHeight-20);
+
+doc.setDrawColor(255,140,0);
+doc.setLineWidth(1);
+doc.rect(15,15,pageWidth-30,pageHeight-30);
+
+/* ===== SCHOOL LOGO ===== */
+doc.addImage("logo.png","PNG",20,20,30,30);
+
+/* ===== SCHOOL NAME ===== */
+doc.setTextColor(139,0,0);
+doc.setFont("helvetica","bold");
+doc.setFontSize(26);
+doc.text("Birla Open Minds International School", pageWidth/2, 30, {align:"center"});
+
 doc.setFontSize(16);
-doc.text("Cyber Awareness Quiz 2026",20,45);
+doc.text("Purnea", pageWidth/2, 40, {align:"center"});
 
-doc.setFontSize(14);
-doc.text("This certificate is awarded to:",20,70);
+/* ===== TITLE ===== */
+doc.setFontSize(24);
+doc.setTextColor(0,0,0);
+doc.text("Certificate of Achievement", pageWidth/2, 65, {align:"center"});
 
-doc.setFontSize(18);
-doc.text(name,20,85);
+/* ===== BODY TEXT ===== */
+doc.setFontSize(16);
+doc.setFont("helvetica","normal");
+doc.text("This certificate is proudly presented to", pageWidth/2, 85, {align:"center"});
 
-doc.setFontSize(14);
-doc.text(`Class: ${grade}`,20,100);
-doc.text(`Score: ${percent}%`,20,110);
+/* ===== STUDENT NAME ===== */
+doc.setFont("helvetica","bold");
+doc.setFontSize(28);
+doc.setTextColor(0,0,139);
+doc.text(name, pageWidth/2, 105, {align:"center"});
 
-doc.text("Congratulations for your achievement!",20,130);
+/* ===== DETAILS ===== */
+doc.setFontSize(16);
+doc.setTextColor(0,0,0);
+doc.setFont("helvetica","normal");
 
+doc.text(`For outstanding performance in Cyber Awareness Quiz 2026`, pageWidth/2, 120, {align:"center"});
+doc.text(`Class: ${grade}`, pageWidth/2, 135, {align:"center"});
+doc.text(`Score Achieved: ${percent}%`, pageWidth/2, 145, {align:"center"});
+
+/* ===== DATE ===== */
+let today = new Date().toLocaleDateString();
+doc.text(`Date: ${today}`, 30, pageHeight-30);
+
+/* ===== SIGNATURE AREA ===== */
+doc.line(pageWidth-80, pageHeight-40, pageWidth-30, pageHeight-40);
+doc.text("Principal", pageWidth-55, pageHeight-30, {align:"center"});
+
+/* ===== SAVE ===== */
 doc.save(name+"_Certificate.pdf");
 }
 
