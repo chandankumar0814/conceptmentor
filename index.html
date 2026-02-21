@@ -200,6 +200,14 @@ const grades={
 let overallData=[];
 let averages={};
 
+function toSentenceCase(name){
+    return name
+        .toLowerCase()
+        .split(" ")
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+}
+    
 async function loadExcel(file){
 
 let totalMarks = grades[file];
@@ -237,11 +245,17 @@ json.forEach(row => {
 
         let percent = ((score / totalMarks) * 100).toFixed(2);
 
-        let obj = {
-            name: name,
-            percent: parseFloat(percent),
-            grade: file.replace(".xlsx", "")
-        };
+        let cleanName = toSentenceCase(name.trim());
+
+let cleanGrade = file
+    .replace(".xlsx","")
+    .replace("grade","Grade ");
+
+let obj = {
+    name: cleanName,
+    percent: parseFloat(percent),
+    grade: cleanGrade
+};
 
         students.push(obj);
         overallData.push(obj);
