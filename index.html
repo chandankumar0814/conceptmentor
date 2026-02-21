@@ -276,18 +276,35 @@ createClassBoard(file.replace(".xlsx",""),students);
 }
 
 function createClassBoard(title,data){
+
 let div=document.createElement("div");
 div.className="section";
 
 let html=`<h2>${title.toUpperCase()} Leaderboard</h2>
-<table><tr><th>Rank</th><th>Name</th><th>%</th><th>Certificate</th></tr>`;
+<table>
+<tr><th>Rank</th><th>Name</th><th>%</th><th>Certificate</th></tr>`;
 
 data.forEach((s,i)=>{
+
+let rank=i+1;
+s.rank=rank;   // store rank
+
+let certType = rank<=3 ? "Winner" : "Participation";
+
 html+=`<tr>
-<td>${i+1}</td>
+<td>${rank}</td>
 <td>${s.name}</td>
 <td>${s.percent}%</td>
-<td><button onclick="downloadCertificate('${s.name}',${s.percent},'${s.grade}')">Download</button></td>
+<td>
+<button onclick="downloadCertificate(
+'${s.name}',
+${s.percent},
+'${s.grade}',
+${rank}
+)">
+Download
+</button>
+</td>
 </tr>`;
 });
 
@@ -373,7 +390,7 @@ document.getElementById("searchResult").innerHTML=html;
 }
 
 /* CERTIFICATE */
-function downloadCertificate(name, percent, grade){
+function downloadCertificate(name, percent, grade, rank){
 
 const { jsPDF } = window.jspdf;
 let doc = new jsPDF("landscape");
@@ -381,7 +398,7 @@ let doc = new jsPDF("landscape");
 let pageWidth = doc.internal.pageSize.getWidth();
 let pageHeight = doc.internal.pageSize.getHeight();
 
-/* ===== BORDER ===== */
+/* BORDER */
 doc.setDrawColor(139,0,0);
 doc.setLineWidth(3);
 doc.rect(10,10,pageWidth-20,pageHeight-20);
@@ -390,52 +407,73 @@ doc.setDrawColor(255,140,0);
 doc.setLineWidth(1);
 doc.rect(15,15,pageWidth-30,pageHeight-30);
 
-/* ===== SCHOOL LOGO ===== */
+/* LOGO */
 doc.addImage("logo.png","PNG",20,20,30,30);
 
-/* ===== SCHOOL NAME ===== */
-doc.setTextColor(139,0,0);
+/* SCHOOL NAME */
 doc.setFont("helvetica","bold");
 doc.setFontSize(26);
+doc.setTextColor(139,0,0);
 doc.text("Birla Open Minds International School", pageWidth/2, 30, {align:"center"});
 
 doc.setFontSize(16);
 doc.text("Purnea", pageWidth/2, 40, {align:"center"});
 
-/* ===== TITLE ===== */
+/* DATE FIXED */
+let today="21/02/2026";
+
+/* CERTIFICATE TYPE */
 doc.setFontSize(24);
 doc.setTextColor(0,0,0);
-doc.text("Certificate of Achievement", pageWidth/2, 65, {align:"center"});
 
-/* ===== BODY TEXT ===== */
+let isWinner = rank<=3;
+
+if(isWinner){
+    doc.text("Certificate of Achievement", pageWidth/2, 65, {align:"center"});
+}else{
+    doc.text("Certificate of Participation", pageWidth/2, 65, {align:"center"});
+}
+
+/* BODY */
 doc.setFontSize(16);
-doc.setFont("helvetica","normal");
 doc.text("This certificate is proudly presented to", pageWidth/2, 85, {align:"center"});
 
-/* ===== STUDENT NAME ===== */
-doc.setFont("helvetica","bold");
+/* NAME */
 doc.setFontSize(28);
 doc.setTextColor(0,0,139);
 doc.text(name, pageWidth/2, 105, {align:"center"});
 
-/* ===== DETAILS ===== */
 doc.setFontSize(16);
 doc.setTextColor(0,0,0);
-doc.setFont("helvetica","normal");
 
-doc.text(`For outstanding performance in Cyber Awareness Quiz 2026`, pageWidth/2, 120, {align:"center"});
-doc.text(`Class: ${grade}`, pageWidth/2, 135, {align:"center"});
-doc.text(`Score Achieved: ${percent}%`, pageWidth/2, 145, {align:"center"});
+doc.text(`Class: ${grade}`, pageWidth/2, 120, {align:"center"});
+doc.text(`Score: ${percent}%`, pageWidth/2, 130, {align:"center"});
 
-/* ===== DATE ===== */
-let today = "21/02/2026";
+/* WINNER MESSAGE */
+if(isWinner){
+
+let rankText = rank==1 ? "1st Rank"
+             : rank==2 ? "2nd Rank"
+             : "3rd Rank";
+
+doc.setFontSize(18);
+doc.setTextColor(139,0,0);
+doc.text(`Secured ${rankText} in Cyber Awareness Quiz 2026`, pageWidth/2, 145, {align:"center"});
+
+}else{
+
+doc.setFontSize(16);
+doc.text("For active participation in Cyber Awareness Quiz 2026", pageWidth/2, 145, {align:"center"});
+}
+
+/* DATE */
+doc.setFontSize(14);
 doc.text(`Date: ${today}`, 30, pageHeight-30);
 
-/* ===== SIGNATURE AREA ===== */
+/* SIGNATURE */
 doc.line(pageWidth-80, pageHeight-40, pageWidth-30, pageHeight-40);
 doc.text("Principal", pageWidth-55, pageHeight-30, {align:"center"});
 
-/* ===== SAVE ===== */
 doc.save(name+"_Certificate.pdf");
 }
 
