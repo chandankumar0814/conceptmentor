@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Cyber Awareness Quiz 2026 - Leaderboard</title>
+    <title>Birla Open Minds International School - Cyber Awareness Results</title>
     <meta charset="UTF-8">
 
-    <!-- XLSX Reader -->
+    <!-- XLSX Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <!-- Chart.js -->
@@ -13,13 +13,36 @@
     <style>
         body {
             font-family: Arial;
-            background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-            color:white;
-            text-align:center;
+            background: linear-gradient(135deg,#8B0000,#FF6F00);
             margin:0;
+            text-align:center;
+            color:white;
         }
 
-        h1 { margin-top:20px; }
+        .header {
+            background:white;
+            padding:20px;
+            color:#8B0000;
+        }
+
+        .header img {
+            width:150px;
+        }
+
+        .school-name {
+            font-size:28px;
+            font-weight:bold;
+            margin-top:10px;
+        }
+
+        .school-location {
+            font-size:18px;
+            color:#444;
+        }
+
+        h2 {
+            margin-top:20px;
+        }
 
         .container {
             width:90%;
@@ -27,7 +50,7 @@
         }
 
         .section {
-            background:rgba(255,255,255,0.1);
+            background:rgba(255,255,255,0.15);
             padding:20px;
             margin:20px 0;
             border-radius:12px;
@@ -48,7 +71,7 @@
         }
 
         th {
-            background:#111;
+            background:#8B0000;
             color:white;
         }
 
@@ -73,12 +96,25 @@
             border-radius:10px;
             padding:10px;
         }
+
+        footer{
+            margin-top:30px;
+            padding:10px;
+            background:#8B0000;
+        }
     </style>
 </head>
 
 <body>
 
-<h1>🏆 Cyber Awareness Quiz 2026</h1>
+<!-- SCHOOL HEADER -->
+<div class="header">
+    <img src="logo.png" alt="School Logo">
+    <div class="school-name">Birla Open Minds International School</div>
+    <div class="school-location">Purnea</div>
+</div>
+
+<h2>🏆 Cyber Awareness Quiz 2026 Results</h2>
 
 <div class="container">
 
@@ -105,6 +141,10 @@
     <div id="classLeaderboards"></div>
 
 </div>
+
+<footer>
+    © 2026 Birla Open Minds International School, Purnea
+</footer>
 
 <script>
 
@@ -158,7 +198,7 @@ async function loadExcel(fileName){
     students.sort((a,b)=>b.percentage-a.percentage);
 
     let total = students.reduce((sum,s)=>sum+s.percentage,0);
-    classAverages[fileName.replace(".xlsx","")] = 
+    classAverages[fileName.replace(".xlsx","")] =
         (total/students.length).toFixed(2);
 
     createClassLeaderboard(fileName.replace(".xlsx",""),students);
