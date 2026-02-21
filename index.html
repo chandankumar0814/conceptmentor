@@ -202,51 +202,61 @@ let averages={};
 
 async function loadExcel(file){
 
-let totalMarks=grades[file];
+let totalMarks = grades[file];
 
-let res=await fetch(file);
-let data=await res.arrayBuffer();
-let wb=XLSX.read(data);
-let sheet=wb.Sheets[wb.SheetNames[0]];
-let json=XLSX.utils.sheet_to_json(sheet);
+let res = await fetch(file);
+let data = await res.arrayBuffer();
+let wb = XLSX.read(data);
+let sheet = wb.Sheets[wb.SheetNames[0]];
+let json = XLSX.utils.sheet_to_json(sheet);
 
-let students=[];
+let students = [];
 
-json.forEach(row=>{
+json.forEach(row => {
 
-    // Automatically detect name column
-    let name =
-        row["Student Name"] ||
-        row["Name"] ||
-        row["Full Name"] ||
-        Object.values(row)[1];   // fallback (second column)
+    let name = "";
+    let score = "";
 
-    // Automatically detect score column
-    let score =
-        row["Score"] ||
-        row["Total score"] ||
-        row["Total Score"] ||
-        Object.values(row)[Object.values(row).length-1]; // last column
+    // Detect columns safely
+    for (let key in row) {
+
+        let lowerKey = key.toLowerCase();
+
+        if (lowerKey.includes("name")) {
+            name = row[key];
+        }
+
+        if (lowerKey.includes("score")) {
+            score = row[key];
+        }
+    }
 
     score = parseFloat(score);
 
-    if(name && !isNaN(score)){
-        let percent=((score/totalMarks)*100).toFixed(2);
-        let obj={name,percent:parseFloat(percent),grade:file.replace(".xlsx","")};
+    if (name && !isNaN(score)) {
+
+        let percent = ((score / totalMarks) * 100).toFixed(2);
+
+        let obj = {
+            name: name,
+            percent: parseFloat(percent),
+            grade: file.replace(".xlsx", "")
+        };
+
         students.push(obj);
         overallData.push(obj);
     }
 });
 
-if(students.length===0){
-    console.log("No valid data found in",file);
+if (students.length === 0) {
+    console.log("No valid data found in", file);
     return;
 }
 
 students.sort((a,b)=>b.percent-a.percent);
 
-let avg=students.reduce((s,x)=>s+x.percent,0)/students.length;
-averages[file.replace(".xlsx","")]=avg.toFixed(2);
+let avg = students.reduce((s,x)=>s+x.percent,0) / students.length;
+averages[file.replace(".xlsx","")] = avg.toFixed(2);
 
 createClassBoard(file.replace(".xlsx",""),students);
 }
