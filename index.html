@@ -280,7 +280,11 @@ function createClassBoard(title,data){
 let div=document.createElement("div");
 div.className="section";
 
-let html=`<h2>${title.toUpperCase()} Leaderboard</h2>
+let formattedTitle = title
+    .replace("grade","Grade ")
+    .replace("Grade  ","Grade "); // safety
+
+let html=`<h2>${formattedTitle} Leaderboard</h2>
 <table>
 <tr><th>Rank</th><th>Name</th><th>%</th><th>Certificate</th></tr>`;
 
