@@ -1,3 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Birla Open Minds International School - Cyber Awareness Results</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body{
+    font-family: Arial;
+    margin:0;
+    background:linear-gradient(135deg,#8B0000,#FF6F00);
+    text-align:center;
+    color:white;
+}
+.header{
+    background:white;
+    padding:20px;
+    color:#8B0000;
+}
+.header img{ width:120px; }
+.school-name{ font-size:22px; font-weight:bold; }
+.school-location{ font-size:16px; color:#444; }
+.container{ width:95%; max-width:1200px; margin:auto; }
+.section{
+    background:rgba(255,255,255,0.15);
+    margin:20px 0;
+    padding:15px;
+    border-radius:12px;
+}
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    color:black;
+}
+th,td{
+    padding:8px;
+    border-bottom:1px solid #ddd;
+    font-size:14px;
+}
+th{
+    background:#8B0000;
+    color:white;
+}
+button{
+    padding:6px 10px;
+    background:#8B0000;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+footer{
+    background:#8B0000;
+    padding:10px;
+    margin-top:30px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <img src="logo.png">
+    <div class="school-name">Birla Open Minds International School</div>
+    <div class="school-location">Purnea</div>
+</div>
+
+<h2>🏆 Cyber Awareness Quiz 2026 Results</h2>
+
+<div class="container">
+<div id="classBoards"></div>
+</div>
+
+<footer>
+© 2026 Birla Open Minds International School, Purnea
+</footer>
+
 <script>
 
 const grades={
@@ -9,97 +92,80 @@ const grades={
 };
 
 let overallData=[];
-let combined567 = [];
-let averages={};
-let classDataStore = {};
+let combined567=[];
+let classDataStore={};
 
 function toSentenceCase(name){
-    return name
-        .toLowerCase()
-        .split(" ")
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ");
+    return name.toLowerCase().split(" ")
+    .map(word=>word.charAt(0).toUpperCase()+word.slice(1))
+    .join(" ");
 }
 
 async function loadExcel(file){
 
 let totalMarks = grades[file];
-
 let res = await fetch(file);
 let data = await res.arrayBuffer();
 let wb = XLSX.read(data);
 let sheet = wb.Sheets[wb.SheetNames[0]];
 let json = XLSX.utils.sheet_to_json(sheet);
 
-let students = [];
+let students=[];
 
-json.forEach(row => {
+json.forEach(row=>{
 
-    let name = "";
-    let score = "";
+    let name="", score="";
 
-    for (let key in row) {
-        let lowerKey = key.toLowerCase();
-
-        if (lowerKey.includes("name")) name = row[key];
-        if (lowerKey.includes("score")) score = row[key];
+    for(let key in row){
+        let lower=key.toLowerCase();
+        if(lower.includes("name")) name=row[key];
+        if(lower.includes("score")) score=row[key];
     }
 
-    score = parseFloat(score);
+    score=parseFloat(score);
 
-    if (name && !isNaN(score)) {
+    if(name && !isNaN(score)){
 
-        let percent = ((score / totalMarks) * 100).toFixed(2);
-        let cleanName = toSentenceCase(name.trim());
-        let gradeNumber = parseInt(file.replace(/[^0-9]/g,""));
-        let cleanGrade = "Grade " + gradeNumber;
+        let percent=((score/totalMarks)*100).toFixed(2);
+        let gradeNumber=parseInt(file.replace(/[^0-9]/g,""));
+        let grade="Grade "+gradeNumber;
 
-        let obj = {
-            name: cleanName,
-            percent: parseFloat(percent),
-            grade: cleanGrade,
-            combinedRank: 0
+        let obj={
+            name:toSentenceCase(name.trim()),
+            percent:parseFloat(percent),
+            grade:grade,
+            combinedRank:0
         };
 
         students.push(obj);
         overallData.push(obj);
 
-        if(gradeNumber===5 || gradeNumber===6 || gradeNumber===7){
+        if(gradeNumber===5||gradeNumber===6||gradeNumber===7){
             combined567.push(obj);
         }
     }
 });
 
 students.sort((a,b)=>b.percent-a.percent);
-
-let avg = students.reduce((s,x)=>s+x.percent,0) / students.length;
-averages[file.replace(".xlsx","")] = avg.toFixed(2);
-
-classDataStore[file.replace(".xlsx","")] = students;
+classDataStore[file.replace(".xlsx","")]=students;
 }
 
-/* 🔥 Combined ranking for 5,6,7 */
+/* Combined ranking for 5,6,7 */
 function rankCombined567(){
-
 combined567.sort((a,b)=>b.percent-a.percent);
-
-combined567.forEach(s => s.combinedRank = 0);
-
-for(let i=0; i<3 && i<combined567.length; i++){
-    combined567[i].combinedRank = i+1;
+for(let i=0;i<3 && i<combined567.length;i++){
+    combined567[i].combinedRank=i+1;
 }
 }
 
-/* 🔥 Create Leaderboard */
+/* Leaderboard */
 function createClassBoard(title,data){
 
+let gradeNumber=parseInt(title.replace(/[^0-9]/g,""));
 let div=document.createElement("div");
 div.className="section";
 
-let gradeNumber = parseInt(title.replace(/[^0-9]/g,""));
-let formattedTitle = "Grade " + gradeNumber;
-
-let html=`<h2>${formattedTitle} Leaderboard</h2>
+let html=`<h2>Grade ${gradeNumber} Leaderboard</h2>
 <table>
 <tr><th>Rank</th><th>Name</th><th>%</th><th>Certificate</th></tr>`;
 
@@ -108,28 +174,18 @@ data.forEach((s,i)=>{
 let rankDisplay="-";
 let rankValue=0;
 
-/* Grade 3 & 4 separate ranking */
-if(gradeNumber===3 || gradeNumber===4){
-    if(i===0){ rankDisplay="1st"; rankValue=1; }
-    else if(i===1){ rankDisplay="2nd"; rankValue=2; }
-    else if(i===2){ rankDisplay="3rd"; rankValue=3; }
+/* Grade 3 & 4 */
+if(gradeNumber===3||gradeNumber===4){
+    if(i===0){rankDisplay="1st";rankValue=1;}
+    else if(i===1){rankDisplay="2nd";rankValue=2;}
+    else if(i===2){rankDisplay="3rd";rankValue=3;}
 }
 
-/* Grades 5,6,7 combined ranking */
-else if(gradeNumber===5 || gradeNumber===6 || gradeNumber===7){
-
-    if(s.combinedRank===1){
-        rankDisplay="1st";
-        rankValue=1;
-    }
-    else if(s.combinedRank===2){
-        rankDisplay="2nd";
-        rankValue=2;
-    }
-    else if(s.combinedRank===3){
-        rankDisplay="3rd";
-        rankValue=3;
-    }
+/* Grades 5,6,7 Combined */
+if(gradeNumber===5||gradeNumber===6||gradeNumber===7){
+    if(s.combinedRank===1){rankDisplay="1st";rankValue=1;}
+    else if(s.combinedRank===2){rankDisplay="2nd";rankValue=2;}
+    else if(s.combinedRank===3){rankDisplay="3rd";rankValue=3;}
 }
 
 html+=`<tr>
@@ -137,12 +193,7 @@ html+=`<tr>
 <td>${s.name}</td>
 <td>${s.percent}%</td>
 <td>
-<button onclick="downloadCertificate(
-'${s.name}',
-${s.percent},
-'${s.grade}',
-${rankValue}
-)">
+<button onclick="downloadCertificate('${s.name}',${s.percent},'${s.grade}',${rankValue})">
 Download
 </button>
 </td>
@@ -154,109 +205,54 @@ div.innerHTML=html;
 document.getElementById("classBoards").appendChild(div);
 }
 
-function displayOverall(){
-overallData.sort((a,b)=>b.percent-a.percent);
-let top=overallData.slice(0,10);
-
-let html=`<table><tr><th>Rank</th><th>Name</th><th>Class</th><th>%</th></tr>`;
-top.forEach((s,i)=>{
-html+=`<tr><td>${i+1}</td><td>${s.name}</td><td>${s.grade}</td><td>${s.percent}%</td></tr>`;
-});
-html+="</table>";
-document.getElementById("overall").innerHTML=html;
-}
-
-function displayPodium(){
-overallData.sort((a,b)=>b.percent-a.percent);
-if(overallData.length<3)return;
-
-document.getElementById("first").innerHTML="🥇<br>"+overallData[0].name+"<br>"+overallData[0].percent+"%";
-document.getElementById("second").innerHTML="🥈<br>"+overallData[1].name+"<br>"+overallData[1].percent+"%";
-document.getElementById("third").innerHTML="🥉<br>"+overallData[2].name+"<br>"+overallData[2].percent+"%";
-}
-
-/* CERTIFICATE */
-function downloadCertificate(name, percent, grade, rank){
+/* Certificate */
+function downloadCertificate(name,percent,grade,rank){
 
 const { jsPDF } = window.jspdf;
-let doc = new jsPDF("landscape");
+let doc=new jsPDF("landscape");
+let w=doc.internal.pageSize.getWidth();
 
-let pageWidth = doc.internal.pageSize.getWidth();
-let pageHeight = doc.internal.pageSize.getHeight();
-
-doc.setDrawColor(139,0,0);
-doc.setLineWidth(3);
-doc.rect(10,10,pageWidth-20,pageHeight-20);
-
-doc.setDrawColor(255,140,0);
-doc.setLineWidth(1);
-doc.rect(15,15,pageWidth-30,pageHeight-30);
-
-doc.setFont("helvetica","bold");
 doc.setFontSize(26);
-doc.setTextColor(139,0,0);
-doc.text("Birla Open Minds International School", pageWidth/2, 30, {align:"center"});
+doc.text("Birla Open Minds International School",w/2,30,{align:"center"});
+doc.setFontSize(18);
+doc.text("Cyber Awareness Quiz 2026",w/2,45,{align:"center"});
+
+let isWinner=rank>0;
+
+doc.setFontSize(22);
+doc.text(isWinner?"Certificate of Achievement":"Certificate of Participation",w/2,70,{align:"center"});
 
 doc.setFontSize(16);
-doc.text("Purnea", pageWidth/2, 40, {align:"center"});
-
-doc.setFontSize(24);
-doc.setTextColor(0,0,0);
-
-let isWinner = rank>0;
-
-if(isWinner){
-    doc.text("Certificate of Achievement", pageWidth/2, 65, {align:"center"});
-}else{
-    doc.text("Certificate of Participation", pageWidth/2, 65, {align:"center"});
-}
-
-doc.setFontSize(16);
-doc.text("This certificate is proudly presented to", pageWidth/2, 85, {align:"center"});
+doc.text("This certificate is presented to",w/2,90,{align:"center"});
 
 doc.setFontSize(28);
-doc.setTextColor(0,0,139);
-doc.text(name, pageWidth/2, 105, {align:"center"});
+doc.text(name,w/2,110,{align:"center"});
 
 doc.setFontSize(16);
-doc.setTextColor(0,0,0);
-
-doc.text(`Class: ${grade}`, pageWidth/2, 120, {align:"center"});
-doc.text(`Score: ${percent}%`, pageWidth/2, 130, {align:"center"});
+doc.text(`Class: ${grade}`,w/2,125,{align:"center"});
+doc.text(`Score: ${percent}%`,w/2,135,{align:"center"});
 
 if(isWinner){
-let rankText = rank==1 ? "1st Rank"
-             : rank==2 ? "2nd Rank"
-             : "3rd Rank";
-
-doc.setFontSize(18);
-doc.setTextColor(139,0,0);
-doc.text(`Secured ${rankText} in Cyber Awareness Quiz 2026`, pageWidth/2, 145, {align:"center"});
+let rankText=rank==1?"1st":rank==2?"2nd":"3rd";
+doc.text(`Secured ${rankText} Rank`,w/2,155,{align:"center"});
 }else{
-doc.setFontSize(16);
-doc.text("For active participation in Cyber Awareness Quiz 2026", pageWidth/2, 145, {align:"center"});
+doc.text("For active participation",w/2,155,{align:"center"});
 }
 
 doc.save(name+"_Certificate.pdf");
 }
 
-/* INIT */
 async function init(){
-
-for(let f in grades){
-    await loadExcel(f);
-}
-
+for(let f in grades){ await loadExcel(f); }
 rankCombined567();
-
 for(let className in classDataStore){
-    createClassBoard(className, classDataStore[className]);
+    createClassBoard(className,classDataStore[className]);
 }
-
-displayOverall();
-displayPodium();
+confetti({particleCount:200,spread:120});
 }
 
 init();
 
 </script>
+</body>
+</html>
