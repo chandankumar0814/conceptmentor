@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cyber Awareness Quiz 2026 - Leaderboard</title>
+    <meta charset="UTF-8">
+
+    <!-- XLSX Reader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+            color:white;
+            text-align:center;
+            margin:0;
+        }
+
+        h1 { margin-top:20px; }
+
+        .container {
+            width:90%;
+            margin:auto;
+        }
+
+        .section {
+            background:rgba(255,255,255,0.1);
+            padding:20px;
+            margin:20px 0;
+            border-radius:12px;
+        }
+
+        table {
+            width:100%;
+            background:white;
+            color:black;
+            border-collapse:collapse;
+            border-radius:8px;
+            overflow:hidden;
+        }
+
+        th,td {
+            padding:10px;
+            border-bottom:1px solid #ddd;
+        }
+
+        th {
+            background:#111;
+            color:white;
+        }
+
+        tr:nth-child(even){
+            background:#f2f2f2;
+        }
+
+        .gold{background:gold;}
+        .silver{background:silver;}
+        .bronze{background:#cd7f32;}
+
+        input {
+            padding:10px;
+            width:300px;
+            border-radius:5px;
+            border:none;
+            margin:10px;
+        }
+
+        canvas{
+            background:white;
+            border-radius:10px;
+            padding:10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>🏆 Cyber Awareness Quiz 2026</h1>
+
+<div class="container">
+
+    <!-- SEARCH -->
+    <div class="section">
+        <h2>🔎 Search Student</h2>
+        <input type="text" id="searchBox" placeholder="Enter student name..." onkeyup="searchStudent()">
+        <div id="searchResult"></div>
+    </div>
+
+    <!-- OVERALL -->
+    <div class="section">
+        <h2>🏫 Overall School Top 10 (Percentage)</h2>
+        <div id="overallLeaderboard"></div>
+    </div>
+
+    <!-- GRAPH -->
+    <div class="section">
+        <h2>📊 Class Average Percentage</h2>
+        <canvas id="classChart"></canvas>
+    </div>
+
+    <!-- CLASS LEADERBOARDS -->
+    <div id="classLeaderboards"></div>
+
+</div>
+
+<script>
+
+const grades = {
+    "grade3.xlsx": 100,
+    "grade4.xlsx": 96,
+    "grade5.xlsx": 124,
+    "grade6.xlsx": 54,
+    "grade7.xlsx": 60
+};
+
+let overallData = [];
+let classAverages = {};
+
+async function loadExcel(fileName){
+
+    const totalMarks = grades[fileName];
+
+    const response = await fetch(fileName);
+    const data = await response.arrayBuffer();
+    const workbook = XLSX.read(data);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const json = XLSX.utils.sheet_to_json(sheet);
+
+    let students = [];
+
+    json.forEach(row=>{
+        let name = row["Student Name"] || row["Student Name:"] || row["Name"];
+        let scoreText = row["Score"];
+
+        if(name && scoreText){
+
+            let score = parseFloat(scoreText);
+
+            if(!isNaN(score)){
+
+                let percentage = ((score / totalMarks) * 100).toFixed(2);
+
+                let studentObj = {
+                    name,
+                    percentage: parseFloat(percentage),
+                    grade:fileName.replace(".xlsx","")
+                };
+
+                students.push(studentObj);
+                overallData.push(studentObj);
+            }
+        }
+    });
+
+    students.sort((a,b)=>b.percentage-a.percentage);
+
+    let total = students.reduce((sum,s)=>sum+s.percentage,0);
+    classAverages[fileName.replace(".xlsx","")] = 
+        (total/students.length).toFixed(2);
+
+    createClassLeaderboard(fileName.replace(".xlsx",""),students);
+}
+
+function createClassLeaderboard(title,students){
+
+    let container = document.createElement("div");
+    container.className="section";
+
+    let html = `<h2>${title.toUpperCase()} Leaderboard</h2>
+    <table>
+    <tr><th>Rank</th><th>Name</th><th>Percentage</th></tr>`;
+
+    students.forEach((s,i)=>{
+        let medal="";
+        if(i==0) medal="gold";
+        else if(i==1) medal="silver";
+        else if(i==2) medal="bronze";
+
+        html+=`<tr class="${medal}">
+                <td>${i+1}</td>
+                <td>${s.name}</td>
+                <td>${s.percentage}%</td>
+               </tr>`;
+    });
+
+    html+="</table>";
+    container.innerHTML=html;
+    document.getElementById("classLeaderboards").appendChild(container);
+}
+
+function displayOverall(){
+
+    overallData.sort((a,b)=>b.percentage-a.percentage);
+    let top10 = overallData.slice(0,10);
+
+    let html=`<table>
+    <tr><th>Rank</th><th>Name</th><th>Class</th><th>Percentage</th></tr>`;
+
+    top10.forEach((s,i)=>{
+        html+=`<tr>
+        <td>${i+1}</td>
+        <td>${s.name}</td>
+        <td>${s.grade}</td>
+        <td>${s.percentage}%</td>
+        </tr>`;
+    });
+
+    html+="</table>";
+    document.getElementById("overallLeaderboard").innerHTML=html;
+}
+
+function createChart(){
+
+    new Chart(document.getElementById("classChart"),{
+        type:'bar',
+        data:{
+            labels:Object.keys(classAverages),
+            datasets:[{
+                label:'Average Percentage',
+                data:Object.values(classAverages)
+            }]
+        },
+        options:{
+            scales:{
+                y:{
+                    beginAtZero:true,
+                    max:100
+                }
+            }
+        }
+    });
+}
+
+function searchStudent(){
+
+    let input = document.getElementById("searchBox").value.toLowerCase();
+
+    if(input===""){
+        document.getElementById("searchResult").innerHTML="";
+        return;
+    }
+
+    let result = overallData.filter(s=>
+        s.name.toLowerCase().includes(input)
+    );
+
+    let html="";
+    result.forEach(s=>{
+        html+=`<p>${s.name} | ${s.grade} | ${s.percentage}%</p>`;
+    });
+
+    document.getElementById("searchResult").innerHTML=html || "<p>No student found</p>";
+}
+
+async function init(){
+    for(let file in grades){
+        await loadExcel(file);
+    }
+    displayOverall();
+    createChart();
+}
+
+init();
+
+</script>
+
+</body>
+</html>
