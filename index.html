@@ -287,17 +287,12 @@ function rankCombined567(){
 
 combined567.sort((a,b)=>b.percent-a.percent);
 
-// Clear previous winners
 combinedWinners = {};
 
-if(combined567[0]){
-    combinedWinners[combined567[0].name] = 1;
-}
-if(combined567[1]){
-    combinedWinners[combined567[1].name] = 2;
-}
-if(combined567[2]){
-    combinedWinners[combined567[2].name] = 3;
+for(let i=0;i<3 && i<combined567.length;i++){
+
+    let key = combined567[i].name + "_" + combined567[i].grade;
+    combinedWinners[key] = i+1;
 }
 }
     
@@ -329,8 +324,10 @@ if(gradeNumber===3 || gradeNumber===4){
 /* 🔹 Grades 5,6,7 → Combined Ranking */
 else if(gradeNumber===5 || gradeNumber===6 || gradeNumber===7){
 
-    if(combinedWinners[s.name]){
-        rankValue = combinedWinners[s.name];
+    let key = s.name + "_" + s.grade;
+
+if(combinedWinners[key]){
+        rankValue = combinedWinners[key];
 
         if(rankValue===1) rankDisplay="1st";
         else if(rankValue===2) rankDisplay="2nd";
