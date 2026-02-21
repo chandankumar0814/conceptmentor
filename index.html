@@ -1,115 +1,147 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Birla Open Minds International School - Cyber Awareness Results</title>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
+<title>Birla Open Minds International School - Cyber Awareness Results</title>
 
-    <!-- XLSX Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- XLSX -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <style>
-        body {
-            font-family: Arial;
-            background: linear-gradient(135deg,#8B0000,#FF6F00);
-            margin:0;
-            text-align:center;
-            color:white;
-        }
+<!-- Confetti -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-        .header {
-            background:white;
-            padding:20px;
-            color:#8B0000;
-        }
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-        .header img {
-            width:150px;
-        }
+<style>
 
-        .school-name {
-            font-size:28px;
-            font-weight:bold;
-            margin-top:10px;
-        }
+body{
+    font-family: Arial;
+    margin:0;
+    background:linear-gradient(135deg,#8B0000,#FF6F00);
+    text-align:center;
+    color:white;
+}
 
-        .school-location {
-            font-size:18px;
-            color:#444;
-        }
+.header{
+    background:white;
+    padding:20px;
+    color:#8B0000;
+}
 
-        h2 {
-            margin-top:20px;
-        }
+.header img{
+    width:120px;
+}
 
-        .container {
-            width:90%;
-            margin:auto;
-        }
+.school-name{
+    font-size:22px;
+    font-weight:bold;
+}
 
-        .section {
-            background:rgba(255,255,255,0.15);
-            padding:20px;
-            margin:20px 0;
-            border-radius:12px;
-        }
+.school-location{
+    font-size:16px;
+    color:#444;
+}
 
-        table {
-            width:100%;
-            background:white;
-            color:black;
-            border-collapse:collapse;
-            border-radius:8px;
-            overflow:hidden;
-        }
+.container{
+    width:95%;
+    max-width:1200px;
+    margin:auto;
+}
 
-        th,td {
-            padding:10px;
-            border-bottom:1px solid #ddd;
-        }
+.section{
+    background:rgba(255,255,255,0.15);
+    margin:20px 0;
+    padding:15px;
+    border-radius:12px;
+}
 
-        th {
-            background:#8B0000;
-            color:white;
-        }
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    color:black;
+}
 
-        tr:nth-child(even){
-            background:#f2f2f2;
-        }
+th,td{
+    padding:8px;
+    border-bottom:1px solid #ddd;
+    font-size:14px;
+}
 
-        .gold{background:gold;}
-        .silver{background:silver;}
-        .bronze{background:#cd7f32;}
+th{
+    background:#8B0000;
+    color:white;
+}
 
-        input {
-            padding:10px;
-            width:300px;
-            border-radius:5px;
-            border:none;
-            margin:10px;
-        }
+input{
+    padding:8px;
+    width:90%;
+    max-width:300px;
+    border-radius:5px;
+    border:none;
+}
 
-        canvas{
-            background:white;
-            border-radius:10px;
-            padding:10px;
-        }
+button{
+    padding:6px 10px;
+    background:#8B0000;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
 
-        footer{
-            margin-top:30px;
-            padding:10px;
-            background:#8B0000;
-        }
-    </style>
+footer{
+    background:#8B0000;
+    padding:10px;
+    margin-top:30px;
+}
+
+/* PODIUM */
+
+.podium{
+    display:flex;
+    justify-content:center;
+    align-items:flex-end;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.place{
+    width:100px;
+    padding:10px;
+    border-radius:10px 10px 0 0;
+    font-weight:bold;
+    animation:rise 1.5s ease forwards;
+    opacity:0;
+}
+
+.first{height:180px;background:gold;}
+.second{height:140px;background:silver;}
+.third{height:110px;background:#cd7f32;}
+
+@keyframes rise{
+    from{transform:translateY(100px);opacity:0;}
+    to{transform:translateY(0);opacity:1;}
+}
+
+/* MOBILE */
+
+@media(max-width:600px){
+    th,td{font-size:12px;padding:5px;}
+    .place{width:80px;font-size:12px;}
+}
+
+</style>
 </head>
 
 <body>
 
-<!-- SCHOOL HEADER -->
 <div class="header">
-    <img src="logo.png" alt="School Logo">
+    <img src="logo.png">
     <div class="school-name">Birla Open Minds International School</div>
     <div class="school-location">Purnea</div>
 </div>
@@ -118,189 +150,185 @@
 
 <div class="container">
 
-    <!-- SEARCH -->
-    <div class="section">
-        <h2>🔎 Search Student</h2>
-        <input type="text" id="searchBox" placeholder="Enter student name..." onkeyup="searchStudent()">
-        <div id="searchResult"></div>
-    </div>
+<!-- PODIUM -->
+<div class="section">
+<h2>🏆 Top 3 Champions</h2>
+<div class="podium">
+<div class="place second" id="second"></div>
+<div class="place first" id="first"></div>
+<div class="place third" id="third"></div>
+</div>
+</div>
 
-    <!-- OVERALL -->
-    <div class="section">
-        <h2>🏫 Overall School Top 10 (Percentage)</h2>
-        <div id="overallLeaderboard"></div>
-    </div>
+<!-- SEARCH -->
+<div class="section">
+<h2>🔎 Search Student</h2>
+<input type="text" id="searchBox" placeholder="Enter name..." onkeyup="searchStudent()">
+<div id="searchResult"></div>
+</div>
 
-    <!-- GRAPH -->
-    <div class="section">
-        <h2>📊 Class Average Percentage</h2>
-        <canvas id="classChart"></canvas>
-    </div>
+<!-- OVERALL -->
+<div class="section">
+<h2>🏫 Overall Top 10</h2>
+<div id="overall"></div>
+</div>
 
-    <!-- CLASS LEADERBOARDS -->
-    <div id="classLeaderboards"></div>
+<!-- GRAPH -->
+<div class="section">
+<h2>📊 Class Average Percentage</h2>
+<canvas id="chart"></canvas>
+</div>
+
+<div id="classBoards"></div>
 
 </div>
 
 <footer>
-    © 2026 Birla Open Minds International School, Purnea
+© 2026 Birla Open Minds International School, Purnea
 </footer>
 
 <script>
 
-const grades = {
-    "grade3.xlsx": 100,
-    "grade4.xlsx": 96,
-    "grade5.xlsx": 124,
-    "grade6.xlsx": 54,
-    "grade7.xlsx": 60
+const grades={
+"grade3.xlsx":100,
+"grade4.xlsx":96,
+"grade5.xlsx":124,
+"grade6.xlsx":54,
+"grade7.xlsx":60
 };
 
-let overallData = [];
-let classAverages = {};
+let overallData=[];
+let averages={};
 
-async function loadExcel(fileName){
+async function loadExcel(file){
+let totalMarks=grades[file];
+let res=await fetch(file);
+let data=await res.arrayBuffer();
+let wb=XLSX.read(data);
+let sheet=wb.Sheets[wb.SheetNames[0]];
+let json=XLSX.utils.sheet_to_json(sheet);
 
-    const totalMarks = grades[fileName];
+let students=[];
 
-    const response = await fetch(fileName);
-    const data = await response.arrayBuffer();
-    const workbook = XLSX.read(data);
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const json = XLSX.utils.sheet_to_json(sheet);
+json.forEach(row=>{
+let name=row["Student Name"]||row["Name"];
+let score=parseFloat(row["Score"]);
+if(name && !isNaN(score)){
+let percent=((score/totalMarks)*100).toFixed(2);
+let obj={name,percent:parseFloat(percent),grade:file.replace(".xlsx","")};
+students.push(obj);
+overallData.push(obj);
+}
+});
 
-    let students = [];
+students.sort((a,b)=>b.percent-a.percent);
 
-    json.forEach(row=>{
-        let name = row["Student Name"] || row["Student Name:"] || row["Name"];
-        let scoreText = row["Score"];
+let avg=students.reduce((s,x)=>s+x.percent,0)/students.length;
+averages[file.replace(".xlsx","")]=avg.toFixed(2);
 
-        if(name && scoreText){
-
-            let score = parseFloat(scoreText);
-
-            if(!isNaN(score)){
-
-                let percentage = ((score / totalMarks) * 100).toFixed(2);
-
-                let studentObj = {
-                    name,
-                    percentage: parseFloat(percentage),
-                    grade:fileName.replace(".xlsx","")
-                };
-
-                students.push(studentObj);
-                overallData.push(studentObj);
-            }
-        }
-    });
-
-    students.sort((a,b)=>b.percentage-a.percentage);
-
-    let total = students.reduce((sum,s)=>sum+s.percentage,0);
-    classAverages[fileName.replace(".xlsx","")] =
-        (total/students.length).toFixed(2);
-
-    createClassLeaderboard(fileName.replace(".xlsx",""),students);
+createClassBoard(file.replace(".xlsx",""),students);
 }
 
-function createClassLeaderboard(title,students){
+function createClassBoard(title,data){
+let div=document.createElement("div");
+div.className="section";
 
-    let container = document.createElement("div");
-    container.className="section";
+let html=`<h2>${title.toUpperCase()} Leaderboard</h2>
+<table><tr><th>Rank</th><th>Name</th><th>%</th><th>Certificate</th></tr>`;
 
-    let html = `<h2>${title.toUpperCase()} Leaderboard</h2>
-    <table>
-    <tr><th>Rank</th><th>Name</th><th>Percentage</th></tr>`;
+data.forEach((s,i)=>{
+html+=`<tr>
+<td>${i+1}</td>
+<td>${s.name}</td>
+<td>${s.percent}%</td>
+<td><button onclick="downloadCertificate('${s.name}',${s.percent},'${s.grade}')">Download</button></td>
+</tr>`;
+});
 
-    students.forEach((s,i)=>{
-        let medal="";
-        if(i==0) medal="gold";
-        else if(i==1) medal="silver";
-        else if(i==2) medal="bronze";
-
-        html+=`<tr class="${medal}">
-                <td>${i+1}</td>
-                <td>${s.name}</td>
-                <td>${s.percentage}%</td>
-               </tr>`;
-    });
-
-    html+="</table>";
-    container.innerHTML=html;
-    document.getElementById("classLeaderboards").appendChild(container);
+html+="</table>";
+div.innerHTML=html;
+document.getElementById("classBoards").appendChild(div);
 }
 
 function displayOverall(){
+overallData.sort((a,b)=>b.percent-a.percent);
+let top=overallData.slice(0,10);
 
-    overallData.sort((a,b)=>b.percentage-a.percentage);
-    let top10 = overallData.slice(0,10);
+let html=`<table><tr><th>Rank</th><th>Name</th><th>Class</th><th>%</th></tr>`;
+top.forEach((s,i)=>{
+html+=`<tr><td>${i+1}</td><td>${s.name}</td><td>${s.grade}</td><td>${s.percent}%</td></tr>`;
+});
+html+="</table>";
+document.getElementById("overall").innerHTML=html;
+}
 
-    let html=`<table>
-    <tr><th>Rank</th><th>Name</th><th>Class</th><th>Percentage</th></tr>`;
+function displayPodium(){
+overallData.sort((a,b)=>b.percent-a.percent);
+if(overallData.length<3)return;
 
-    top10.forEach((s,i)=>{
-        html+=`<tr>
-        <td>${i+1}</td>
-        <td>${s.name}</td>
-        <td>${s.grade}</td>
-        <td>${s.percentage}%</td>
-        </tr>`;
-    });
-
-    html+="</table>";
-    document.getElementById("overallLeaderboard").innerHTML=html;
+document.getElementById("first").innerHTML="🥇<br>"+overallData[0].name+"<br>"+overallData[0].percent+"%";
+document.getElementById("second").innerHTML="🥈<br>"+overallData[1].name+"<br>"+overallData[1].percent+"%";
+document.getElementById("third").innerHTML="🥉<br>"+overallData[2].name+"<br>"+overallData[2].percent+"%";
 }
 
 function createChart(){
-
-    new Chart(document.getElementById("classChart"),{
-        type:'bar',
-        data:{
-            labels:Object.keys(classAverages),
-            datasets:[{
-                label:'Average Percentage',
-                data:Object.values(classAverages)
-            }]
-        },
-        options:{
-            scales:{
-                y:{
-                    beginAtZero:true,
-                    max:100
-                }
-            }
-        }
-    });
+new Chart(document.getElementById("chart"),{
+type:'bar',
+data:{labels:Object.keys(averages),
+datasets:[{label:'Average %',data:Object.values(averages)}]},
+options:{scales:{y:{beginAtZero:true,max:100}}}
+});
 }
 
 function searchStudent(){
+let val=document.getElementById("searchBox").value.toLowerCase();
+let res=overallData.filter(s=>s.name.toLowerCase().includes(val));
+let html="";
+res.forEach(s=>{
+html+=`<p>${s.name} | ${s.grade} | ${s.percent}% 
+<button onclick="downloadCertificate('${s.name}',${s.percent},'${s.grade}')">Download</button></p>`;
+});
+document.getElementById("searchResult").innerHTML=html;
+}
 
-    let input = document.getElementById("searchBox").value.toLowerCase();
+/* CERTIFICATE */
+function downloadCertificate(name,percent,grade){
+const {jsPDF}=window.jspdf;
+let doc=new jsPDF();
 
-    if(input===""){
-        document.getElementById("searchResult").innerHTML="";
-        return;
-    }
+doc.setFontSize(20);
+doc.text("Birla Open Minds International School",20,30);
+doc.setFontSize(16);
+doc.text("Cyber Awareness Quiz 2026",20,45);
 
-    let result = overallData.filter(s=>
-        s.name.toLowerCase().includes(input)
-    );
+doc.setFontSize(14);
+doc.text("This certificate is awarded to:",20,70);
 
-    let html="";
-    result.forEach(s=>{
-        html+=`<p>${s.name} | ${s.grade} | ${s.percentage}%</p>`;
-    });
+doc.setFontSize(18);
+doc.text(name,20,85);
 
-    document.getElementById("searchResult").innerHTML=html || "<p>No student found</p>";
+doc.setFontSize(14);
+doc.text(`Class: ${grade}`,20,100);
+doc.text(`Score: ${percent}%`,20,110);
+
+doc.text("Congratulations for your achievement!",20,130);
+
+doc.save(name+"_Certificate.pdf");
+}
+
+/* CONFETTI */
+function launchConfetti(){
+confetti({particleCount:200,spread:100,origin:{y:0.6}});
 }
 
 async function init(){
-    for(let file in grades){
-        await loadExcel(file);
-    }
-    displayOverall();
-    createChart();
+for(let f in grades){
+await loadExcel(f);
+}
+displayOverall();
+displayPodium();
+createChart();
+launchConfetti();
 }
 
 init();
